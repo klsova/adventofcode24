@@ -31,15 +31,26 @@
 
 #Analyze the unusual data from the engineers. How many reports are safe?
 
-def is_safe_report(report):
-    levels = list(map(int, report.split()))
+def is_safe_report(levels):
     increasing = all(1 <= levels[i+1] - levels[i] <= 3 for i in range(len(levels) - 1))
     decreasing = all(1 <= levels[i] - levels[i+1] <= 3 for i in range(len(levels) - 1))
     return increasing or decreasing
 
+def is_safe_with_dampener(levels):
+    for i in range(len(levels)):
+        new_levels = levels[:i] + levels[i+1:]
+        if is_safe_report(new_levels):
+            return True
+    return False
+
+
 def safe_reports_count(data):
     reports = data.strip().split('\n')
-    safe_count = sum(1 for report in reports if is_safe_report(report))
+    safe_count = 0
+    for report in reports:
+        levels = list(map(int, report.split()))
+        if is_safe_report(levels) or is_safe_with_dampener(levels):
+            safe_count += 1
     return safe_count
 
 with open ('input.txt') as f:
